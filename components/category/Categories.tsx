@@ -1,90 +1,25 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TextInput, Image, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
-
-interface Category {
-	id: string;
-	title: string;
-	description: string;
-	image: any;
-}
-
-const data: Category[] = [
-	{
-		id: '1',
-		title: 'Deportivas',
-		description: 'Partidos fútbol, baloncesto',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '2',
-		title: 'Recreativas',
-		description: 'Caminatas, ping pong, karaoke',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '3',
-		title: 'Obligatorias',
-		description: 'Charlas de beca, salud, talleres',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '4',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '5',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '6',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '7',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '8',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '9',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '10',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-	{
-		id: '11',
-		title: 'Matrícula',
-		description: 'Matrícula, retiros justificados',
-		image: require('@/images/PrimeraImagen.png'),
-	},
-];
+import useCategoriesStore from '@/store/categories.store';
+import {Category} from '@/types/Category.type';
 
 const Categories: React.FC = () => {
 	const [search, setSearch] = useState('');
+	const getCategories = useCategoriesStore((state) => state.getCategories);
+	const categories = useCategoriesStore((state) => state.categories);
+
+	useEffect(() => {
+		if (categories == null) {
+			getCategories('A');
+		}
+	}, [categories]);
+
 	const renderItem = ({item}: {item: Category}) => (
 		<TouchableOpacity style={styles.categoryItem}>
 			<Image source={item.image} style={styles.categoryImage} />
 			<View style={styles.categoryText}>
-				<Text style={styles.categoryTitle}>{item.title}</Text>
+				<Text style={styles.categoryTitle}>{item.name}</Text>
 				<Text style={styles.categoryDescription}>{item.description}</Text>
 			</View>
 		</TouchableOpacity>
@@ -108,12 +43,21 @@ const Categories: React.FC = () => {
 			</View>
 
 			<Text style={styles.sectionTitle}>Categorías</Text>
-			<FlatList
-				data={data}
-				renderItem={renderItem}
-				keyExtractor={(item) => item.id}
-				style={styles.categoryList}
-			/>
+			{categories != null ? (
+				<FlatList
+					data={categories}
+					renderItem={renderItem}
+					keyExtractor={(item) => item.id?.toString() || ''}
+					style={styles.categoryList}
+				/>
+			) : (
+				<FlatList
+					data={categories}
+					renderItem={renderItem}
+					keyExtractor={(item) => item.id?.toString() || ''}
+					style={styles.categoryList}
+				/>
+			)}
 		</View>
 	);
 };
