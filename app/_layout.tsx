@@ -6,10 +6,7 @@ import {useEffect} from 'react';
 import 'react-native-reanimated';
 
 import {useColorScheme} from '@/hooks/useColorScheme';
-import {StyleSheet, Text, View} from 'react-native';
-import FirstScreen from '@/components/startScreen/FirstScreen';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -30,10 +27,6 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-			{/* <View style={styles.container}>
-				<FirstScreen></FirstScreen>
-			</View> */}
-
 			<Stack>
 				<Stack.Screen name="(tabs)" options={{headerShown: true}} />
 				<Stack.Screen name="+not-found" />
@@ -41,30 +34,3 @@ export default function RootLayout() {
 		</ThemeProvider>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		height: '100%',
-	},
-	titleContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 8,
-	},
-	stepContainer: {
-		gap: 8,
-		marginBottom: 8,
-	},
-	reactLogo: {
-		height: 178,
-		width: 290,
-		bottom: 0,
-		left: 0,
-		position: 'absolute',
-	},
-	image: {
-		height: 25,
-		width: 20,
-		alignItems: 'center',
-	},
-});
