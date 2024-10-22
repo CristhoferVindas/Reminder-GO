@@ -2,8 +2,19 @@ import React, {useState} from 'react';
 import {View, Button, StyleSheet, Text} from 'react-native';
 import {Calendar, DateData} from 'react-native-calendars';
 import moment from 'moment';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {CalendarStackParamList} from '@/app/stackCalendar/StackCalendar';
 
-const CalendarScreen = () => {
+type CalendarScreenNavigationProp = StackNavigationProp<
+	CalendarStackParamList,
+	'CalendarActivities'
+>;
+
+type Props = {
+	navigation: CalendarScreenNavigationProp;
+};
+
+const CalendarScreen = ({navigation}: Props) => {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState('');
 	return (
@@ -37,7 +48,10 @@ const CalendarScreen = () => {
 				<Text>{`Fecha seleccionada: ${selectedDate}`}</Text>
 				<Button
 					title="Seleccionar"
-					onPress={() => console.log('Fecha seleccionada:', selectedDate)}
+					onPress={() => (
+						console.log('Fecha seleccionada:', selectedDate),
+						navigation.navigate('CalendarActivities', {date: selectedDate})
+					)}
 					color="#4A3AFF"
 				/>
 			</View>

@@ -1,12 +1,12 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-const configuration = () => {
+const Configuration = () => {
 	return (
-		<View>
+		<View style={{backgroundColor: 'red'}}>
 			<Text>vbcvbc</Text>
 		</View>
 	);
 };
 
-export default configuration;
+export default Configuration;
