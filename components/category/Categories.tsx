@@ -1,10 +1,28 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TextInput, Image, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+	View,
+	Text,
+	TextInput,
+	Image,
+	FlatList,
+	StyleSheet,
+	TouchableOpacity,
+	Button,
+} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import useCategoriesStore from '@/store/categories.store';
 import {Category} from '@/types/Category.type';
 
-const Categories: React.FC = () => {
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '@/app/stackCategory/StackCategory';
+
+type ActivitiesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Activities'>;
+
+type Props = {
+	navigation: ActivitiesScreenNavigationProp;
+};
+
+const Categories = ({navigation}: Props) => {
 	const [search, setSearch] = useState('');
 	const getCategories = useCategoriesStore((state) => state.getCategories);
 	const categories = useCategoriesStore((state) => state.categories);
@@ -16,7 +34,10 @@ const Categories: React.FC = () => {
 	}, [categories]);
 
 	const renderItem = ({item}: {item: Category}) => (
-		<TouchableOpacity style={styles.categoryItem}>
+		<TouchableOpacity
+			style={styles.categoryItem}
+			onPress={() => navigation.navigate('Activities', {categoryId: item?.id || 0})}
+		>
 			<Image source={item.image} style={styles.categoryImage} />
 			<View style={styles.categoryText}>
 				<Text style={styles.categoryTitle}>{item.name}</Text>
@@ -27,8 +48,11 @@ const Categories: React.FC = () => {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.header}>
-				<Image source={{uri: 'https://via.placeholder.com/100'}} style={styles.profileImage} />
+			<View style={styles.profileContainer}>
+				<Image
+					source={{uri: 'https://randomuser.me/api/portraits/women/95.jpg'}}
+					style={styles.profileImage}
+				/>
 				<Text style={styles.profileName}>Nataly Vaitkevich</Text>
 			</View>
 
@@ -82,6 +106,11 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 		marginLeft: 10,
+	},
+	profileContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: 20,
 	},
 	searchContainer: {
 		flexDirection: 'row',
