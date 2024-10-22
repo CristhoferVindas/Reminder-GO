@@ -1,93 +1,107 @@
-import React, {useState} from 'react';
+import {RootStackParamList} from '@/app/stackCategory/StackCategory';
+import React, {useEffect, useState} from 'react';
 import {View, Text, Image, Switch, FlatList, StyleSheet} from 'react-native';
+import {useRoute, RouteProp} from '@react-navigation/native';
+import useActivitiesStore from '@/store/activities.store';
+import {Activity} from '@/types/Activity.type';
+import useClassificationsStore from '@/store/classification.store';
+import {convertDateToDMYString, convertDateToTimeString} from '@/functions/handleTime';
 
-interface Activity {
-	id: string;
-	title: string;
-	time: string;
-	date: string;
-	type: 'mandatory' | 'regular' | 'optional';
-}
+const Activities = () => {
+	const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>({});
 
-const App = () => {
-	const [mandatory, setMandatory] = useState(true);
-	const [regular, setRegular] = useState(true);
-	const [optional, setOptional] = useState(true);
+	const activitiesByCategory = useActivitiesStore((state) => state.activitiesByCategory);
+	const getActivitiesByCategoryID = useActivitiesStore((state) => state.getActivitiesByCategoryID);
 
-	const activities: Activity[] = [
-		{id: '1', title: 'Charla beca', time: '10:00 am', date: '09 agosto', type: 'mandatory'},
-		{id: '2', title: 'Taller despéjate', time: '10:00 am', date: '23 agosto', type: 'mandatory'},
-		{id: '3', title: 'Caminada sendero', time: '10:00 am', date: '26 agosto', type: 'regular'},
-		{id: '4', title: 'Partido fútbol visita', time: '10:00 am', date: '28 octubre', type: 'optional'},
-		{id: '5', title: 'Partido fútbol 2', time: '10:00 am', date: '29 octubre', type: 'optional'},
-	];
+	const classifications = useClassificationsStore((state) => state.classifications);
+	const getClassifications = useClassificationsStore((state) => state.getClassifications);
+
+	const route = useRoute<RouteProp<RootStackParamList, 'Activities'>>();
+	const {categoryId} = route.params;
+
+	useEffect(() => {
+		getActivitiesByCategoryID(categoryId);
+		getClassifications('A');
+	}, [categoryId]);
+
+	useEffect(() => {
+		if (classifications) {
+			const initialSwitchStates = classifications.reduce((acc, classification) => {
+				acc[classification.id || 0] = true;
+				return acc;
+			}, {} as {[key: string]: boolean});
+			setSwitchStates(initialSwitchStates);
+		}
+	}, [classifications]);
+
+	const toggleSwitch = (classificationId: string) => {
+		setSwitchStates((prevState) => ({
+			...prevState,
+			[classificationId]: !prevState[classificationId], // Cambiamos el estado del switch correspondiente
+		}));
+	};
 
 	const renderActivity = ({item}: {item: Activity}) => {
-		let iconColor;
-		if (item.type === 'mandatory') {
-			iconColor = '#FF6347';
-		} else if (item.type === 'regular') {
-			iconColor = '#1E90FF';
-		} else {
-			iconColor = '#32CD32';
+		let iconColor = '#32CD32'; // Valor por defecto, si no se encuentra clasificación.
+
+		if (item.classifications) {
+			const classification = classifications?.find(
+				(classification) => classification.id === item.classifications.id
+			);
+
+			if (classification) {
+				iconColor = classification.color;
+			}
 		}
 
 		return (
 			<View style={styles.activityContainer}>
 				<View style={[styles.iconContainer, {backgroundColor: iconColor}]} />
 				<View style={styles.textContainer}>
-					<Text style={styles.activityTitle}>{item.title}</Text>
+					<Text style={styles.activityTitle}>{item.name}</Text>
 					<Text style={styles.activityDetails}>
-						{item.time} - {item.date}
+						{convertDateToDMYString(new Date(item.date))} - {convertDateToTimeString(new Date(item.time))}
 					</Text>
 				</View>
 			</View>
 		);
 	};
 
+	const filteredActivities = activitiesByCategory?.filter((activity) => {
+		if (activity.classifications) {
+			return switchStates[activity?.classifications?.id || 0];
+		}
+		return false;
+	});
+
 	return (
 		<View style={styles.container}>
-			<View style={styles.profileContainer}>
-				<Image
-					source={{uri: 'https://randomuser.me/api/portraits/women/95.jpg'}}
-					style={styles.profileImage}
-				/>
-				<Text style={styles.profileName}>Nataly Vaitkevich</Text>
-			</View>
-
+			{/* Renderizamos los switches dinámicamente */}
 			<View style={styles.filtersContainer}>
-				<View style={styles.filterItem}>
-					<Text style={styles.filterLabel}>Obligatorias</Text>
-					<Switch
-						value={mandatory}
-						onValueChange={() => setMandatory(!mandatory)}
-						thumbColor={mandatory ? '#FF6347' : '#f4f3f4'}
-						trackColor={{false: '#767577', true: '#767577'}}
-					/>
-				</View>
-				<View style={styles.filterItem}>
-					<Text style={styles.filterLabel}>Regulares</Text>
-					<Switch
-						value={regular}
-						onValueChange={() => setRegular(!regular)}
-						thumbColor={regular ? '#1E90FF' : '#f4f3f4'}
-						trackColor={{false: '#767577', true: '#767577'}}
-					/>
-				</View>
-				<View style={styles.filterItem}>
-					<Text style={styles.filterLabel}>No obligatorias</Text>
-					<Switch
-						value={optional}
-						onValueChange={() => setOptional(!optional)}
-						thumbColor={optional ? '#32CD32' : '#f4f3f4'}
-						trackColor={{false: '#767577', true: '#767577'}}
-					/>
-				</View>
+				{classifications?.map((classification) => (
+					<View key={classification.id} style={styles.filterItem}>
+						<Text style={styles.filterLabel}>{classification.name}</Text>
+						<Switch
+							value={switchStates[classification.id || 0]}
+							onValueChange={() => toggleSwitch(classification.id?.toString() || '')}
+							thumbColor={switchStates[classification.id || 0] ? classification.color : '#f4f3f4'}
+							trackColor={{false: '#767577', true: '#767577'}}
+						/>
+					</View>
+				))}
 			</View>
 
 			<View style={styles.activitiesContainer}>
 				<Text style={styles.activitiesTitle}>Actividades</Text>
-				<FlatList data={activities} renderItem={renderActivity} keyExtractor={(item) => item.id} />
+				{classifications != null ? (
+					<FlatList
+						data={activitiesByCategory}
+						renderItem={renderActivity}
+						keyExtractor={(item) => String(item.id)}
+					/>
+				) : (
+					<Text>No hay actividades</Text>
+				)}
 			</View>
 		</View>
 	);
@@ -103,6 +117,11 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		marginBottom: 20,
+	},
+	categoryIdText: {
+		fontSize: 16,
+		marginBottom: 10,
+		color: '#333',
 	},
 	profileImage: {
 		width: 50,
@@ -121,9 +140,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginVertical: 5,
+		marginVertical: 1,
 		backgroundColor: '#333',
-		padding: 10,
+		padding: 5,
 		borderRadius: 10,
 	},
 	filterLabel: {
@@ -148,11 +167,10 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	iconContainer: {
-		width: 25,
+		width: 15,
 		height: 60,
 		borderTopStartRadius: 10,
 		borderBottomStartRadius: 10,
-
 		marginRight: 10,
 	},
 	textContainer: {
@@ -168,4 +186,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default App;
+export default Activities;
