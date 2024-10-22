@@ -1,16 +1,19 @@
-import {Tabs} from 'expo-router';
-import React from 'react';
-
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {Colors} from '@/constants/Colors';
 import {useColorScheme} from '@/hooks/useColorScheme';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {StackCategory} from '../stackCategory/StackCategory';
+import Calendar from './calendar';
+import Saved from './saved';
+import Configuration from './configuration';
+import {StackCalendar} from '../stackCalendar/StackCalendar';
 
+const Tabs = createBottomTabNavigator();
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
 
 	return (
-		<Tabs
+		<Tabs.Navigator
 			screenOptions={{
 				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
 				headerShown: false,
@@ -18,6 +21,7 @@ export default function TabLayout() {
 		>
 			<Tabs.Screen
 				name="index"
+				component={StackCategory}
 				options={{
 					title: 'Inicio',
 					tabBarIcon: ({color, focused}) => (
@@ -27,6 +31,7 @@ export default function TabLayout() {
 			/>
 			<Tabs.Screen
 				name="saved"
+				component={Saved}
 				options={{
 					title: 'Guardados',
 					tabBarIcon: ({color, focused}) => (
@@ -36,6 +41,7 @@ export default function TabLayout() {
 			/>
 			<Tabs.Screen
 				name="calendar"
+				component={StackCalendar}
 				options={{
 					title: 'Calendario',
 					tabBarIcon: ({color, focused}) => (
@@ -45,6 +51,7 @@ export default function TabLayout() {
 			/>
 			<Tabs.Screen
 				name="configuration"
+				component={Configuration}
 				options={{
 					title: 'Configuración',
 					tabBarIcon: ({color, focused}) => (
@@ -52,6 +59,6 @@ export default function TabLayout() {
 					),
 				}}
 			/>
-		</Tabs>
+		</Tabs.Navigator>
 	);
 }
