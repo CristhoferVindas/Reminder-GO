@@ -18,7 +18,7 @@ export function convertDateToTimeString(date: Date) {
 }
 export function convertDateToDMYString(date: Date) {
 	const day = date.getDate().toString().padStart(2, '0');
-	const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Los meses van de 0 a 11, por lo que se suma 1
+	const month = (date.getMonth() + 1).toString().padStart(2, '0');
 	const year = date.getFullYear();
 
 	return `${day}-${month}-${year}`;
