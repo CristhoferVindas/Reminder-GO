@@ -2,8 +2,6 @@ import {Activity} from '@/types/Activity.type';
 
 async function getActivitiesByCategoryID(category_id: number) {
 	try {
-		console.log(process.env.DIRECCIONIP);
-
 		const response = await fetch(
 			`http://${
 				process.env.EXPO_PUBLIC_DIRECCIONIP as string

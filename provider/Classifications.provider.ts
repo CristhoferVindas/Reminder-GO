@@ -9,7 +9,6 @@ async function getClassificationsByStatus(status: string) {
 			throw new Error(`Error en la solicitud: ${response.statusText}`);
 		}
 		const data = await response.json();
-		console.log(data);
 		return data as Classification[];
 	} catch (error) {
 		console.error('Error obteniendo las clasificaciones :', error);
