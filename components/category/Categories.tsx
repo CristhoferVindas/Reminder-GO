@@ -15,6 +15,7 @@ import {Category} from '@/types/Category.type';
 
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@/app/stackCategory/StackCategory';
+import useUsersStore from '@/store/user.store';
 
 type ActivitiesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Activities'>;
 
@@ -26,19 +27,26 @@ const Categories = ({navigation}: Props) => {
 	const [search, setSearch] = useState('');
 	const getCategories = useCategoriesStore((state) => state.getCategories);
 	const categories = useCategoriesStore((state) => state.categories);
+	const user = useUsersStore((state) => state.user);
 
 	useEffect(() => {
-		if (categories == null) {
-			getCategories('A');
+		if (categories == null && user?.institutions?.id) {
+			getCategories('A', user?.institutions.id.toString());
 		}
-	}, [categories]);
+	}, [categories, user]);
 
 	const renderItem = ({item}: {item: Category}) => (
 		<TouchableOpacity
 			style={styles.categoryItem}
 			onPress={() => navigation.navigate('Activities', {categoryId: item?.id || 0})}
 		>
-			<Image source={item.image} style={styles.categoryImage} />
+			<Image
+				source={{
+					uri:
+						'https://e7.pngegg.com/pngimages/75/866/png-clipart-category-management-organization-retail-management-miscellaneous-text-thumbnail.png',
+				}}
+				style={styles.categoryImage}
+			/>
 			<View style={styles.categoryText}>
 				<Text style={styles.categoryTitle}>{item.name}</Text>
 				<Text style={styles.categoryDescription}>{item.description}</Text>
@@ -49,11 +57,8 @@ const Categories = ({navigation}: Props) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.profileContainer}>
-				<Image
-					source={{uri: 'https://randomuser.me/api/portraits/women/95.jpg'}}
-					style={styles.profileImage}
-				/>
-				<Text style={styles.profileName}>Nataly Vaitkevich</Text>
+				<Image source={{uri: user?.image}} style={styles.profileImage} />
+				<Text style={styles.profileName}>{user?.name}</Text>
 			</View>
 
 			<View style={styles.searchContainer}>
@@ -89,7 +94,7 @@ const Categories = ({navigation}: Props) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#f2f2f2',
+		backgroundColor: '#374151',
 		padding: 20,
 	},
 	header: {
@@ -106,6 +111,7 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 		marginLeft: 10,
+		color: '#F97316',
 	},
 	profileContainer: {
 		flexDirection: 'row',
@@ -133,13 +139,14 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 		marginBottom: 10,
+		color: '#F97316',
 	},
 	categoryList: {
 		flex: 1,
 	},
 	categoryItem: {
 		flexDirection: 'row',
-		backgroundColor: '#fff',
+		backgroundColor: '#1e293b',
 		padding: 15,
 		borderRadius: 10,
 		marginBottom: 10,
@@ -152,14 +159,16 @@ const styles = StyleSheet.create({
 	},
 	categoryText: {
 		marginLeft: 10,
+		color: '#ffff',
 	},
 	categoryTitle: {
 		fontSize: 16,
 		fontWeight: 'bold',
+		color: '#ffff',
 	},
 	categoryDescription: {
 		fontSize: 14,
-		color: '#666',
+		color: '#ffff',
 	},
 });
 
