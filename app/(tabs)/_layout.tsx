@@ -3,10 +3,9 @@ import {Colors} from '@/constants/Colors';
 import {useColorScheme} from '@/hooks/useColorScheme';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {StackCategory} from '../stackCategory/StackCategory';
-import Calendar from './calendar';
-import Saved from './saved';
-import Configuration from './configuration';
 import {StackCalendar} from '../stackCalendar/StackCalendar';
+import {StackSavedActiviy} from '../stackSavedActivities/StackSavedActivities';
+import Configuration from '@/components/configuration/Configuration';
 
 const Tabs = createBottomTabNavigator();
 export default function TabLayout() {
@@ -15,8 +14,11 @@ export default function TabLayout() {
 	return (
 		<Tabs.Navigator
 			screenOptions={{
-				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+				tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
 				headerShown: false,
+				tabBarStyle: {
+					backgroundColor: 'black',
+				},
 			}}
 		>
 			<Tabs.Screen
@@ -31,7 +33,7 @@ export default function TabLayout() {
 			/>
 			<Tabs.Screen
 				name="saved"
-				component={Saved}
+				component={StackSavedActiviy}
 				options={{
 					title: 'Guardados',
 					tabBarIcon: ({color, focused}) => (
