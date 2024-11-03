@@ -7,6 +7,7 @@ import useClassificationsStore from '@/store/classification.store';
 import {convertDateToDMYString, convertDateToTimeString} from '@/functions/handleTime';
 import {RootStackParamList} from '@/app/stackCategory/StackCategory';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {RefreshControl, TouchableOpacity} from 'react-native-gesture-handler';
 
 type ActivitiesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ActivitiesDetails'>;
 
