@@ -5,14 +5,17 @@ import {create} from 'zustand';
 interface CategoriesStoreState {
 	category: Category | null;
 	categories: Category[] | null;
-	getCategories: (active: string) => Promise<void>;
+	getCategories: (status: string, institutionId: string) => Promise<void>;
 }
 
 const useCategoriesStore = create<CategoriesStoreState>((set) => ({
 	category: null,
 	categories: null,
-	getCategories: async (active: string) => {
-		const newCategories = await CategoriesProvider.getCategoriesByStatus(active);
+	getCategories: async (status: string, institutionId: string) => {
+		const newCategories = await CategoriesProvider.getCategoriesByStatusAndInstitutionID(
+			status,
+			institutionId
+		);
 		set((state) => ({...state, categories: newCategories}));
 	},
 }));
