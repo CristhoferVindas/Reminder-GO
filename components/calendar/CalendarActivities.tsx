@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import {MaterialIcons} from '@expo/vector-icons'; // For the heart icon
+import {MaterialIcons} from '@expo/vector-icons';
 import {CalendarStackParamList} from '@/app/stackCalendar/StackCalendar';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useRoute, RouteProp} from '@react-navigation/native';
 import useActivitiesStore from '@/store/activities.store';
 import useClassificationsStore from '@/store/classification.store';
-import {Activity} from '@/types/Activity.type'; // Asegúrate de importar el tipo
+import {Activity} from '@/types/Activity.type';
 import {convertDateToDMYString, convertDateToTimeString} from '@/functions/handleTime';
 import {Switch} from 'react-native-gesture-handler';
 
@@ -33,13 +33,13 @@ const CalendarActivities = ({navigation}: Props) => {
 
 	useEffect(() => {
 		getActivitiesByDate(new Date(date));
-		getClassifications('A'); // Cargamos clasificaciones
+		getClassifications('A'); 
 	}, [date]);
 
 	useEffect(() => {
 		if (classifications) {
 			const initialSwitchStates = classifications.reduce((acc, classification) => {
-				acc[classification.id || 0] = true; // Por defecto todas las clasificaciones activas
+				acc[classification.id || 0] = true; 
 				return acc;
 			}, {} as {[key: string]: boolean});
 			setSwitchStates(initialSwitchStates);
@@ -49,12 +49,12 @@ const CalendarActivities = ({navigation}: Props) => {
 	const toggleSwitch = (classificationId: string) => {
 		setSwitchStates((prevState) => ({
 			...prevState,
-			[classificationId]: !prevState[classificationId], // Cambiamos el estado del switch correspondiente
+			[classificationId]: !prevState[classificationId],
 		}));
 	};
 
 	const renderEvent = ({item}: {item: Activity}) => {
-		let iconColor = '#32CD32'; // Valor por defecto si no hay clasificación
+		let iconColor = '#32CD32';
 
 		if (item.classifications) {
 			const classification = classifications?.find(
@@ -62,7 +62,7 @@ const CalendarActivities = ({navigation}: Props) => {
 			);
 
 			if (classification) {
-				iconColor = classification.color; // Asignamos el color de la clasificación
+				iconColor = classification.color;
 			}
 		}
 
@@ -111,7 +111,7 @@ const CalendarActivities = ({navigation}: Props) => {
 			</View>
 
 			<FlatList
-				data={filteredActivities} // Usamos la lista filtrada por clasificación
+				data={activitiesByDate} 
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={renderEvent}
 				contentContainerStyle={styles.list}
@@ -123,7 +123,7 @@ const CalendarActivities = ({navigation}: Props) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#F2F2F2',
+		backgroundColor: '#374151',
 		paddingHorizontal: 20,
 		paddingTop: 40,
 	},
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		marginBottom: 20,
 		textAlign: 'center',
+		color: '#ffff',
 	},
 	list: {
 		paddingBottom: 20,
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
 		height: 60,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#1e293b',
 		borderRadius: 10,
 		marginBottom: 10,
 	},
@@ -203,16 +204,17 @@ const styles = StyleSheet.create({
 	activityTitle: {
 		fontSize: 16,
 		fontWeight: 'bold',
+		color: '#ffff',
 	},
 	activityDetails: {
 		fontSize: 14,
-		color: '#555',
+		color: '#ffff',
 	},
 	favoriteIconContainer: {
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 10, // Agregamos algo de padding para mejor toque
-		marginRight: 10, // Separar un poco el botón del borde
+		padding: 10, 
+		marginRight: 10, 
 	},
 });
 
