@@ -40,9 +40,9 @@ export default function AuthComponent() {
 			setUserInStore({
 				name: insti_x_users_x_roles?.users?.name || '',
 				mail: insti_x_users_x_roles?.users?.mail || '',
-				image: '',
-				first_last_name: '',
-				second_last_name: '',
+				image: insti_x_users_x_roles?.users.image || '',
+				first_last_name: insti_x_users_x_roles?.users.first_last_name || '',
+				second_last_name: insti_x_users_x_roles?.users.second_last_name || '',
 				id: insti_x_users_x_roles?.users?.id,
 				institutions: insti_x_users_x_roles?.institutions,
 				roles: insti_x_users_x_roles?.roles,
