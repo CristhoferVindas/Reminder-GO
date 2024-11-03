@@ -1,14 +1,22 @@
 import {Category} from '@/types/Category.type';
 
-async function getCategoriesByStatus(status: string) {
+async function getCategoriesByStatusAndInstitutionID(active: string, institutionId: string) {
 	try {
-		const ip = process.env.EXPO_PUBLIC_DIRECCIONIP as string;
-		console.log(ip);
-		const response = await fetch(
-			`http://${process.env.EXPO_PUBLIC_DIRECCIONIP as string}:3000/api/categories/active/${status}`
-		);
+		if (!active || !institutionId) {
+			throw new Error('Los parámetros active e institutionId son obligatorios.');
+		}
+
+		const ip = process.env.EXPO_PUBLIC_DIRECCIONIP;
+		if (!ip) {
+			throw new Error('La variable de entorno EXPO_PUBLIC_DIRECCIONIP no está definida.');
+		}
+		const url = `http://${encodeURIComponent(ip)}:3000/api/categories?active=${encodeURIComponent(
+			active
+		)}&institution_id=${encodeURIComponent(institutionId)}`;
+
+		const response = await fetch(url);
 		if (!response.ok) {
-			throw new Error(`Error en la solicitud: ${response.statusText}`);
+			throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
 		}
 		const data = await response.json();
 		return data as Category[];
@@ -17,6 +25,7 @@ async function getCategoriesByStatus(status: string) {
 		throw error;
 	}
 }
+
 export const CategoriesProvider = {
-	getCategoriesByStatus,
+	getCategoriesByStatusAndInstitutionID,
 };
