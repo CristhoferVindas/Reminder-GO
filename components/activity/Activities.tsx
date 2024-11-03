@@ -1,14 +1,22 @@
-import {RootStackParamList} from '@/app/stackCategory/StackCategory';
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, Switch, FlatList, StyleSheet} from 'react-native';
+import {View, Text, Switch, FlatList, StyleSheet} from 'react-native';
 import {useRoute, RouteProp} from '@react-navigation/native';
 import useActivitiesStore from '@/store/activities.store';
 import {Activity} from '@/types/Activity.type';
 import useClassificationsStore from '@/store/classification.store';
 import {convertDateToDMYString, convertDateToTimeString} from '@/functions/handleTime';
+import {RootStackParamList} from '@/app/stackCategory/StackCategory';
+import {StackNavigationProp} from '@react-navigation/stack';
 
-const Activities = () => {
+type ActivitiesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ActivitiesDetails'>;
+
+type Props = {
+	navigation: ActivitiesScreenNavigationProp;
+};
+
+const Activities = ({navigation}: Props) => {
 	const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>({});
+	const [refreshing, setRefreshing] = useState(false);
 
 	const activitiesByCategory = useActivitiesStore((state) => state.activitiesByCategory);
 	const getActivitiesByCategoryID = useActivitiesStore((state) => state.getActivitiesByCategoryID);
@@ -37,12 +45,23 @@ const Activities = () => {
 	const toggleSwitch = (classificationId: string) => {
 		setSwitchStates((prevState) => ({
 			...prevState,
-			[classificationId]: !prevState[classificationId], // Cambiamos el estado del switch correspondiente
+			[classificationId]: !prevState[classificationId],
 		}));
 	};
 
+	const onRefresh = () => {
+		setRefreshing(true);
+		getActivitiesByCategoryID(categoryId);
+		getClassifications('A');
+		setRefreshing(false);
+	};
+
+	const handleActivityPress = (activity: Activity) => {
+		navigation.navigate('ActivitiesDetails', {activityId: activity});
+	};
+
 	const renderActivity = ({item}: {item: Activity}) => {
-		let iconColor = '#32CD32'; // Valor por defecto, si no se encuentra clasificación.
+		let iconColor = '#32CD32';
 
 		if (item.classifications) {
 			const classification = classifications?.find(
@@ -55,28 +74,22 @@ const Activities = () => {
 		}
 
 		return (
-			<View style={styles.activityContainer}>
-				<View style={[styles.iconContainer, {backgroundColor: iconColor}]} />
-				<View style={styles.textContainer}>
-					<Text style={styles.activityTitle}>{item.name}</Text>
-					<Text style={styles.activityDetails}>
-						{convertDateToDMYString(new Date(item.date))} - {convertDateToTimeString(new Date(item.time))}
-					</Text>
+			<TouchableOpacity onPress={() => handleActivityPress(item)}>
+				<View style={styles.activityContainer}>
+					<View style={[styles.iconContainer, {backgroundColor: iconColor}]} />
+					<View style={styles.textContainer}>
+						<Text style={styles.activityTitle}>{item.name}</Text>
+						<Text style={styles.activityDetails}>
+							{convertDateToDMYString(new Date(item.date))} - {convertDateToTimeString(new Date(item.time))}
+						</Text>
+					</View>
 				</View>
-			</View>
+			</TouchableOpacity>
 		);
 	};
 
-	const filteredActivities = activitiesByCategory?.filter((activity) => {
-		if (activity.classifications) {
-			return switchStates[activity?.classifications?.id || 0];
-		}
-		return false;
-	});
-
 	return (
 		<View style={styles.container}>
-			{/* Renderizamos los switches dinámicamente */}
 			<View style={styles.filtersContainer}>
 				{classifications?.map((classification) => (
 					<View key={classification.id} style={styles.filterItem}>
@@ -98,6 +111,7 @@ const Activities = () => {
 						data={activitiesByCategory}
 						renderItem={renderActivity}
 						keyExtractor={(item) => String(item.id)}
+						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 					/>
 				) : (
 					<Text>No hay actividades</Text>
@@ -164,6 +178,7 @@ const styles = StyleSheet.create({
 	},
 	activityDetails: {
 		fontSize: 14,
+		color: '#fff',
 	},
 });
 
