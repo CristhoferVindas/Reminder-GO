@@ -111,27 +111,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 20,
-		backgroundColor: '#f4f4f4',
-	},
-	profileContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 20,
-	},
-	categoryIdText: {
-		fontSize: 16,
-		marginBottom: 10,
-		color: '#333',
-	},
-	profileImage: {
-		width: 50,
-		height: 50,
-		borderRadius: 25,
-		marginRight: 10,
-	},
-	profileName: {
-		fontSize: 18,
-		fontWeight: 'bold',
+		backgroundColor: '#374151',
 	},
 	filtersContainer: {
 		marginBottom: 20,
@@ -157,12 +137,13 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontWeight: 'bold',
 		marginBottom: 10,
+		color: '#fff',
 	},
 	activityContainer: {
 		height: 60,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#1e293b',
 		borderRadius: 10,
 		marginBottom: 10,
 	},
@@ -179,10 +160,10 @@ const styles = StyleSheet.create({
 	activityTitle: {
 		fontSize: 16,
 		fontWeight: 'bold',
+		color: '#fff',
 	},
 	activityDetails: {
 		fontSize: 14,
-		color: '#555',
 	},
 });
 
