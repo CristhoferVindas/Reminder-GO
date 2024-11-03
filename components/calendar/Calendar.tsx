@@ -11,7 +11,7 @@ type CalendarScreenNavigationProp = StackNavigationProp<
 >;
 
 type Props = {
-	navigation: CalendarScreenNavigationProp;
+	navigation: CalendarScreenNavigationProp | null;
 };
 
 const CalendarScreen = ({navigation}: Props) => {
@@ -32,26 +32,23 @@ const CalendarScreen = ({navigation}: Props) => {
 				}}
 				current={moment(currentDate).format('YYYY-MM-DD')}
 				theme={{
-					backgroundColor: '#EDEAFF',
-					calendarBackground: '#EDEAFF',
-					textSectionTitleColor: '#000',
+					backgroundColor: '#374151',
+					calendarBackground: '#374151',
+					textSectionTitleColor: '#ffffff',
 					selectedDayTextColor: '#ffffff',
 					todayTextColor: '#4A3AFF',
-					dayTextColor: '#000',
-					textDisabledColor: '#d9e1e8',
-					monthTextColor: '#000',
+					dayTextColor: '#ffffff',
+					textDisabledColor: '#6B7280',
+					monthTextColor: '#ffffff',
 					arrowColor: '#4A3AFF',
 					indicatorColor: '#4A3AFF',
 				}}
 			/>
 			<View style={styles.buttonContainer}>
-				<Text>{`Fecha seleccionada: ${selectedDate}`}</Text>
+				<Text style={styles.selectedDateText}>{`Fecha seleccionada: ${selectedDate}`}</Text>
 				<Button
 					title="Seleccionar"
-					onPress={() => (
-						console.log('Fecha seleccionada:', selectedDate),
-						navigation.navigate('CalendarActivities', {date: selectedDate})
-					)}
+					onPress={() => navigation?.navigate('CalendarActivities', {date: selectedDate})}
 					color="#4A3AFF"
 				/>
 			</View>
@@ -62,12 +59,15 @@ const CalendarScreen = ({navigation}: Props) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#EDEAFF',
+		backgroundColor: '#374151',
 		padding: 10,
 	},
 	buttonContainer: {
 		marginTop: 20,
 		alignItems: 'center',
+	},
+	selectedDateText: {
+		color: '#ffffff',
 	},
 	navigationContainer: {
 		flexDirection: 'row',
