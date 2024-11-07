@@ -1,5 +1,5 @@
-import {Role} from 'react-native';
 import {Institution} from './Institution';
+import {Role} from './Role.type';
 
 export type User = {
 	id?: number | undefined;
@@ -8,6 +8,6 @@ export type User = {
 	second_last_name: string;
 	mail: string;
 	image: string;
-	roles?: Role;
+	roles: Role;
 	institutions?: Institution;
 };
