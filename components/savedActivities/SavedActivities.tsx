@@ -1,23 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {
-	View,
-	Text,
-	Switch,
-	FlatList,
-	StyleSheet,
-	RefreshControl,
-	TouchableOpacity,
-} from 'react-native';
+import {View, Text, FlatList, StyleSheet, RefreshControl, TouchableOpacity} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '@/app/stackCategory/StackCategory';
 import {Activity} from '@/types/Activity.type';
 import {convertDateToDMYString, convertDateToTimeString} from '@/functions/handleTime';
 import useUsersStore from '@/store/user.store';
 import useUserActivitiesStore from '@/store/userActivities.store';
-import {RootSavedActivitiesDetailsStackParamList} from '@/app/stackSavedActivities/StackSavedActivities';
+import {SavedActivitiesDetailsStackParamList} from '@/app/stackSavedActivities/StackSavedActivities';
+import {MaterialIcons} from '@expo/vector-icons';
+import {UserActivity} from '@/types/UserActivity';
+import useCategoriesStore from '@/store/categories.store';
+import CategoryFilterDropdown from '../filters/CategoryFilterSwitch';
 
 type ActivitiesScreenNavigationProp = StackNavigationProp<
-	RootSavedActivitiesDetailsStackParamList,
+	SavedActivitiesDetailsStackParamList,
 	'ActivitiesDetails'
 >;
 
@@ -28,22 +23,65 @@ type Props = {
 const SavedActivities = ({navigation}: Props) => {
 	const [activities, setActivities] = useState<Activity[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
+	const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>({});
 
 	const user = useUsersStore((state) => state.user);
 	const getUserActivities = useUserActivitiesStore((state) => state.getUserActivities);
 	const userActivities = useUserActivitiesStore((state) => state.userActivities);
+	const deleteUserActivity = useUserActivitiesStore((state) => state.deleteUserActivity);
+
+	const categories = useCategoriesStore((state) => state.categories);
+	const getCategories = useCategoriesStore((state) => state.getCategories);
 
 	useEffect(() => {
 		if (user?.id) {
 			getUserActivities(user.id.toString());
 		}
+		if (user?.institutions?.id) {
+			getCategories('A', user.institutions.id.toString());
+		}
 	}, [user]);
 
 	useEffect(() => {
+		if (categories) {
+			// Inicializa `switchStates` con todos los valores en `false` para que los filtros inicien desactivados
+			const initialSwitchStates = categories.reduce((acc, category) => {
+				acc[category.id || 0] = false;
+				return acc;
+			}, {} as {[key: string]: boolean});
+			setSwitchStates(initialSwitchStates);
+		}
+	}, [categories]);
+
+	useEffect(() => {
+		applyFilters();
+	}, [userActivities, switchStates]);
+
+	const toggleSwitch = (categoryId: string) => {
+		setSwitchStates((prevState) => ({
+			...prevState,
+			[categoryId]: !prevState[categoryId],
+		}));
+	};
+
+	const applyFilters = () => {
+		const activeFilters = Object.keys(switchStates).filter((key) => switchStates[key]);
 		const filteredActivities =
-			userActivities?.map((userxactivities) => userxactivities.activities) || [];
+			activeFilters.length === 0
+				? userActivities?.map((userActivity) => userActivity.activities) || []
+				: userActivities
+						?.filter((userActivity) =>
+							activeFilters.includes(userActivity.activities.category_id?.toString() || '')
+						)
+						.map((userActivity) => userActivity.activities) || [];
+
 		setActivities(filteredActivities);
-	}, [userActivities]);
+	};
+
+	// Función para mostrar todas las actividades cuando no hay filtros activos
+	const onClearFilters = () => {
+		setActivities(userActivities?.map((userActivity) => userActivity.activities) || []);
+	};
 
 	const onRefresh = async () => {
 		setRefreshing(true);
@@ -53,23 +91,32 @@ const SavedActivities = ({navigation}: Props) => {
 		setRefreshing(false);
 	};
 
+	const handleFavoritePress = (userActivity: UserActivity) => {
+		deleteUserActivity(userActivity?.id?.toString() || '');
+	};
+
 	const handleActivityPress = (activity: Activity) => {
 		navigation.navigate('ActivitiesDetails', {activityId: activity});
 	};
 
 	const renderActivity = ({item}: {item: Activity}) => {
-		let iconColor = '#32CD32';
-
+		const userActivity = userActivities?.find((userActivity) => userActivity.activities.id === item.id);
 		return (
 			<TouchableOpacity onPress={() => handleActivityPress(item)}>
 				<View style={styles.activityContainer}>
-					<View style={[styles.iconContainer, {backgroundColor: iconColor}]} />
+					<View style={[styles.iconContainer]} />
 					<View style={styles.textContainer}>
 						<Text style={styles.activityTitle}>{item.name}</Text>
 						<Text style={styles.activityDetails}>
 							{convertDateToDMYString(new Date(item.date))} - {convertDateToTimeString(new Date(item.time))}
 						</Text>
 					</View>
+					<TouchableOpacity
+						style={styles.favoriteIconContainer}
+						onPress={() => handleFavoritePress(userActivity || ({} as UserActivity))}
+					>
+						<MaterialIcons name="delete-forever" size={24} color="#f45d" />
+					</TouchableOpacity>
 				</View>
 			</TouchableOpacity>
 		);
@@ -77,12 +124,15 @@ const SavedActivities = ({navigation}: Props) => {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.filtersContainer}>
-				{/* Renderización de switches basados en clasificaciones (si es necesario) */}
-			</View>
+			<CategoryFilterDropdown
+				categories={categories || []}
+				switchStates={switchStates}
+				onToggleSwitch={toggleSwitch}
+				onClearFilters={onClearFilters} // Pasa la función aquí
+			/>
 
 			<View style={styles.activitiesContainer}>
-				<Text style={styles.activitiesTitle}>Actividades</Text>
+				<Text style={styles.activitiesTitle}>Actividades Guardadas</Text>
 				<FlatList
 					data={activities}
 					renderItem={renderActivity}
@@ -100,22 +150,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		padding: 20,
 		backgroundColor: '#374151',
-	},
-	filtersContainer: {
-		marginBottom: 20,
-	},
-	filterItem: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginVertical: 1,
-		backgroundColor: '#333',
-		padding: 5,
-		borderRadius: 10,
-	},
-	filterLabel: {
-		fontSize: 16,
-		color: '#fff',
 	},
 	activitiesContainer: {
 		flex: 1,
@@ -153,6 +187,12 @@ const styles = StyleSheet.create({
 	activityDetails: {
 		fontSize: 14,
 		color: '#fff',
+	},
+	favoriteIconContainer: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 10,
+		marginRight: 10,
 	},
 });
 
