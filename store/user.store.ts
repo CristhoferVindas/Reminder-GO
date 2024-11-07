@@ -3,6 +3,7 @@ import {User} from '@/types/User.type';
 import {create} from 'zustand';
 
 interface UsersStoreState {
+	usercreatedSuccessful: User | null;
 	user: User | null;
 	createUser: (user: User) => Promise<void>;
 	getUsersByEmail: (email: string) => Promise<void>;
@@ -11,13 +12,15 @@ interface UsersStoreState {
 
 const useUsersStore = create<UsersStoreState>((set) => ({
 	user: null,
+	usercreatedSuccessful: null,
 	getUsersByEmail: async (email: string) => {
 		const users = await UsersProvider.getUsersByEmail(email);
 		set({user: users});
 	},
 	createUser: async (user: User) => {
 		const newUser = await UsersProvider.createUser(user);
-		set({user: newUser});
+
+		set({usercreatedSuccessful: newUser, user: newUser});
 	},
 	setUser: async (user: User | null) => {
 		set({user: user});
