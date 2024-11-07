@@ -7,9 +7,11 @@ interface ActivitiesStoreState {
 	activities: Activity[] | null;
 	activitiesByDate: Activity[] | null;
 	activitiesByCategory: Activity[] | null;
+	activitiesCalendar: Activity[] | null;
 
 	getActivitiesByCategoryID: (category_id: number) => Promise<void>;
 	getActivitiesByDate: (date: Date) => Promise<void>;
+	getActivitiesByInstitutionID: (active: string, institution_id: string) => Promise<void>;
 }
 
 const useActivitiesStore = create<ActivitiesStoreState>((set) => ({
@@ -17,9 +19,15 @@ const useActivitiesStore = create<ActivitiesStoreState>((set) => ({
 	activities: null,
 	activitiesByCategory: null,
 	activitiesByDate: null,
+	activitiesCalendar: null,
+
 	getActivitiesByCategoryID: async (category_id: number) => {
 		const newActivities = await ActivitiesProvider.getActivitiesByCategoryID(category_id);
 		set((state) => ({...state, activitiesByCategory: newActivities}));
+	},
+	getActivitiesByInstitutionID: async (active: string, institution_id: string) => {
+		const newActivities = await ActivitiesProvider.getActivitiesByInstitutionID(active, institution_id);
+		set((state) => ({...state, activitiesCalendar: newActivities}));
 	},
 	getActivitiesByDate: async (date: Date) => {
 		const newActivities = await ActivitiesProvider.getActivitiesByDate(date);
