@@ -1,23 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {
-	View,
-	Text,
-	TextInput,
-	Image,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	Button,
-} from 'react-native';
+import {View, Text, TextInput, Image, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import useCategoriesStore from '@/store/categories.store';
 import {Category} from '@/types/Category.type';
-
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '@/app/stackCategory/StackCategory';
+import {CategoryStackParamList} from '@/app/stackCategory/StackCategory';
 import useUsersStore from '@/store/user.store';
 
-type ActivitiesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Activities'>;
+type ActivitiesScreenNavigationProp = StackNavigationProp<CategoryStackParamList, 'Activities'>;
 
 type Props = {
 	navigation: ActivitiesScreenNavigationProp;
@@ -25,6 +15,7 @@ type Props = {
 
 const Categories = ({navigation}: Props) => {
 	const [search, setSearch] = useState('');
+	const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
 	const getCategories = useCategoriesStore((state) => state.getCategories);
 	const categories = useCategoriesStore((state) => state.categories);
 	const user = useUsersStore((state) => state.user);
@@ -35,10 +26,20 @@ const Categories = ({navigation}: Props) => {
 		}
 	}, [categories, user]);
 
+	useEffect(() => {
+		if (search) {
+			setFilteredCategories(
+				(categories || []).filter((category) => category.name.toLowerCase().includes(search.toLowerCase()))
+			);
+		} else {
+			setFilteredCategories(categories || []);
+		}
+	}, [search, categories]);
+
 	const renderItem = ({item}: {item: Category}) => (
 		<TouchableOpacity
 			style={styles.categoryItem}
-			onPress={() => navigation.navigate('Activities', {categoryId: item?.id || 0})}
+			onPress={() => navigation.navigate('Activities', {categoryId: item})}
 		>
 			<Image
 				source={{
@@ -72,21 +73,12 @@ const Categories = ({navigation}: Props) => {
 			</View>
 
 			<Text style={styles.sectionTitle}>Categorías</Text>
-			{categories != null ? (
-				<FlatList
-					data={categories}
-					renderItem={renderItem}
-					keyExtractor={(item) => item.id?.toString() || ''}
-					style={styles.categoryList}
-				/>
-			) : (
-				<FlatList
-					data={categories}
-					renderItem={renderItem}
-					keyExtractor={(item) => item.id?.toString() || ''}
-					style={styles.categoryList}
-				/>
-			)}
+			<FlatList
+				data={filteredCategories}
+				renderItem={renderItem}
+				keyExtractor={(item) => item.id?.toString() || ''}
+				style={styles.categoryList}
+			/>
 		</View>
 	);
 };
