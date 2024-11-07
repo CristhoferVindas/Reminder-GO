@@ -5,10 +5,14 @@ import {CalendarStackParamList} from '@/app/stackCalendar/StackCalendar';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useRoute, RouteProp} from '@react-navigation/native';
 import useActivitiesStore from '@/store/activities.store';
-import useClassificationsStore from '@/store/classification.store';
+import useCategoriesStore from '@/store/categories.store';
 import {Activity} from '@/types/Activity.type';
 import {convertDateToDMYString, convertDateToTimeString} from '@/functions/handleTime';
-import {Switch} from 'react-native-gesture-handler';
+import useUserActivitiesStore from '@/store/userActivities.store';
+import useUsersStore from '@/store/user.store';
+import {User} from '@/types/User.type';
+import CategoryFilterSwitch from '../filters/CategoryFilterSwitch';
+import {Category} from '@/types/Category.type';
 
 type CalendarScreenNavigationProp = StackNavigationProp<
 	CalendarStackParamList,
@@ -23,98 +27,120 @@ const CalendarActivities = ({navigation}: Props) => {
 	const getActivitiesByDate = useActivitiesStore((state) => state.getActivitiesByDate);
 	const activitiesByDate = useActivitiesStore((state) => state.activitiesByDate);
 
-	const classifications = useClassificationsStore((state) => state.classifications);
-	const getClassifications = useClassificationsStore((state) => state.getClassifications);
+	const categories = useCategoriesStore((state) => state.categories);
+	const getCategories = useCategoriesStore((state) => state.getCategories);
 
 	const route = useRoute<RouteProp<CalendarStackParamList, 'CalendarActivities'>>();
 	const {date} = route.params;
 
+	const userActivities = useUserActivitiesStore((state) => state.userActivities);
+	const createUserActivity = useUserActivitiesStore((state) => state.createUserActivity);
+	const deleteUserActivity = useUserActivitiesStore((state) => state.deleteUserActivity);
+
+	const user = useUsersStore((state) => state.user);
 	const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>({});
 
 	useEffect(() => {
 		getActivitiesByDate(new Date(date));
-		getClassifications('A'); 
+		if (user?.institutions?.id) {
+			getCategories('A', user.institutions.id.toString());
+		}
 	}, [date]);
 
 	useEffect(() => {
-		if (classifications) {
-			const initialSwitchStates = classifications.reduce((acc, classification) => {
-				acc[classification.id || 0] = true; 
+		if (categories) {
+			// Inicializa `switchStates` con todos los valores en `false` para que los filtros inicien desactivados
+			const initialSwitchStates = categories.reduce((acc, category) => {
+				acc[category.id || 0] = false;
 				return acc;
 			}, {} as {[key: string]: boolean});
 			setSwitchStates(initialSwitchStates);
 		}
-	}, [classifications]);
+	}, [categories]);
 
-	const toggleSwitch = (classificationId: string) => {
+	const toggleSwitch = (categoryId: string) => {
 		setSwitchStates((prevState) => ({
 			...prevState,
-			[classificationId]: !prevState[classificationId],
+			[categoryId]: !prevState[categoryId],
 		}));
 	};
 
-	const renderEvent = ({item}: {item: Activity}) => {
-		let iconColor = '#32CD32';
-
-		if (item.classifications) {
-			const classification = classifications?.find(
-				(classification) => classification.id === item.classifications.id
-			);
-
-			if (classification) {
-				iconColor = classification.color;
-			}
+	const handleFavoritePress = (userActivity: Activity) => {
+		const isFavorite = userActivities?.find((activity) => activity.activities.id === userActivity.id);
+		if (isFavorite) {
+			deleteUserActivity(userActivity.id.toString());
+		} else {
+			createUserActivity({
+				users: user || ({} as User),
+				activities: userActivity,
+				activity_id: userActivity.id,
+				user_id: user?.id || 0,
+				classification_id: 0,
+				filed: 'S',
+			});
 		}
+	};
 
-		return (
+	const handleActivityPress = (activity: Activity) => {
+		navigation.navigate('ActivitiesDetails', {activityId: activity});
+	};
+
+	const renderEvent = ({item}: {item: Activity}) => (
+		<TouchableOpacity onPress={() => handleActivityPress(item)}>
 			<View style={styles.activityContainer}>
-				<View style={[styles.iconContainer, {backgroundColor: iconColor}]} />
+				<View style={[styles.iconContainer]} />
 				<View style={styles.textContainer}>
 					<Text style={styles.activityTitle}>{item.name}</Text>
 					<Text style={styles.activityDetails}>
 						{convertDateToDMYString(new Date(item.date))} - {convertDateToTimeString(new Date(item.time))}
 					</Text>
 				</View>
-				<TouchableOpacity style={styles.favoriteIconContainer}>
+				<TouchableOpacity style={styles.favoriteIconContainer} onPress={() => handleFavoritePress(item)}>
 					<MaterialIcons
-						name={item.active === 'yes' ? 'favorite' : 'favorite-border'}
+						name={
+							userActivities?.find((userActivity) => userActivity.activities.id == item.id)
+								? 'favorite'
+								: 'favorite-border'
+						}
 						size={24}
-						color={item.active === 'yes' ? 'blue' : 'gray'}
+						color={
+							userActivities?.find((userActivity) => userActivity.activities.id == item.id) ? '#F97316' : 'gray'
+						}
 					/>
 				</TouchableOpacity>
 			</View>
-		);
-	};
+		</TouchableOpacity>
+	);
 
 	const filteredActivities = activitiesByDate?.filter((activity) => {
-		if (activity.classifications) {
-			return switchStates[activity?.classifications?.id || 0];
+		if (activity.categories) {
+			return switchStates[activity.categories.id || 0];
 		}
 		return false;
 	});
 
+	const displayedActivities = Object.values(switchStates).every((state) => !state)
+		? activitiesByDate
+		: filteredActivities;
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.header}>{convertDateToDMYString(new Date(date))}</Text>
-			<View style={styles.filtersContainer}>
-				{classifications?.map((classification) => (
-					<View key={classification.id} style={styles.filterItem}>
-						<Text style={styles.filterLabel}>{classification.name}</Text>
-						<Switch
-							value={switchStates[classification.id || 0]}
-							onValueChange={() => toggleSwitch(classification.id?.toString() || '')}
-							thumbColor={switchStates[classification.id || 0] ? classification.color : '#f4f3f4'}
-							trackColor={{false: '#767577', true: '#767577'}}
-						/>
-					</View>
-				))}
-			</View>
+
+			{/* Componente de Filtro por Categorías */}
+			<CategoryFilterSwitch
+			onClearFilters={() => { }}
+				categories={categories || ([] as Category[])}
+				switchStates={switchStates}
+				onToggleSwitch={toggleSwitch}
+			/>
 
 			<FlatList
-				data={activitiesByDate} 
+				data={displayedActivities}
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={renderEvent}
 				contentContainerStyle={styles.list}
+				ListEmptyComponent={<Text style={{color: '#fff'}}>No hay actividades</Text>}
 			/>
 		</View>
 	);
@@ -137,58 +163,9 @@ const styles = StyleSheet.create({
 	list: {
 		paddingBottom: 20,
 	},
-	filtersContainer: {
-		marginBottom: 20,
-	},
-	filterItem: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginVertical: 1,
-		backgroundColor: '#333',
-		padding: 5,
-		borderRadius: 10,
-	},
-	filterLabel: {
-		fontSize: 16,
-		color: '#fff',
-	},
-	eventContainer: {
-		height: 60,
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderRadius: 10,
-		marginBottom: 10,
-		borderLeftWidth: 15,
-		marginRight: 10,
-	},
-	eventInfo: {
-		flex: 1,
-	},
-	eventTitle: {
-		fontSize: 16,
-		fontWeight: 'bold',
-	},
-	eventTime: {
-		fontSize: 14,
-		color: '#666',
-	},
-	iconContainer: {
-		width: 15,
-		height: 60,
-		borderTopStartRadius: 10,
-		borderBottomStartRadius: 10,
-		marginRight: 10,
-	},
 	activitiesContainer: {
 		flex: 1,
 		marginTop: 10,
-	},
-	activitiesTitle: {
-		fontSize: 20,
-		fontWeight: 'bold',
-		marginBottom: 10,
 	},
 	activityContainer: {
 		height: 60,
@@ -213,8 +190,15 @@ const styles = StyleSheet.create({
 	favoriteIconContainer: {
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 10, 
-		marginRight: 10, 
+		padding: 10,
+		marginRight: 10,
+	},
+	iconContainer: {
+		width: 15,
+		height: 60,
+		borderTopStartRadius: 10,
+		borderBottomStartRadius: 10,
+		marginRight: 10,
 	},
 });
 
