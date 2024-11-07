@@ -1,17 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {useRoute, RouteProp} from '@react-navigation/native';
-import {RootStackParamList} from '@/app/stackCategory/StackCategory';
+import {CategoryStackParamList} from '@/app/stackCategory/StackCategory';
 import useUserActivitiesStore from '@/store/userActivities.store';
 import useUsersStore from '@/store/user.store';
 import {User} from '@/types/User.type';
+import {registerForPushNotificationsAsync} from '@/notifications/PushNotifications';
+import {Activity} from '@/types/Activity.type';
+import MapScreen from '../Maps/MapView';
 
-type ActivitiesDetailsRouteProp = RouteProp<RootStackParamList, 'ActivitiesDetails'>;
+type ActivitiesDetailsRouteProp = RouteProp<CategoryStackParamList, 'ActivitiesDetails'>;
 
 const ActivitiesDetails = () => {
 	const route = useRoute<ActivitiesDetailsRouteProp>();
 	const {activityId} = route.params;
-
+	const [latitude, longitude] = activityId.location.split(' ').map(Number);
 	const userActivities = useUserActivitiesStore((state) => state.userActivities);
 	const userActivity = useUserActivitiesStore((state) => state.userActivity);
 	const setUserActivity = useUserActivitiesStore((state) => state.setUserActivity);
@@ -33,9 +36,30 @@ const ActivitiesDetails = () => {
 				classification_id: 0,
 				filed: 'S',
 			});
+			scheduleActivity(activityId);
 		}
 	};
+	const scheduleActivity = async (activity: Activity) => {
+		try {
+			const expoPushToken = await registerForPushNotificationsAsync();
+			const scheduledDate = activity.date;
 
+			await fetch(`http://${process.env.EXPO_PUBLIC_DIRECCIONIP as string}:3000/api/notifications`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					expoPushToken,
+					title: activity.name,
+					body: activity.description,
+					scheduledDate,
+				}),
+			});
+		} catch (error) {
+			console.error('Error enviando notificación:', error);
+		}
+	};
 	useEffect(() => {
 		const isActivityFavorite = userActivities?.find(
 			(activity) => activity.activities.id === activityId.id
@@ -48,11 +72,13 @@ const ActivitiesDetails = () => {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.header}>Actividad</Text>
 			<View style={styles.card}>
 				<Text style={styles.title}>{activityId.name}</Text>
 				<Text style={styles.description}>{activityId.description}</Text>
-				<Text style={styles.subheader}>Ubicación</Text>
+				<Text style={styles.description}>Categoría: {activityId.categories.name}</Text>
+
+				<MapScreen key={activityId.id} latitude={latitude} longitude={longitude} />
+
 				<TouchableOpacity style={styles.favoriteButton} onPress={handleFavoritePress}>
 					<Text style={styles.favoriteText}>
 						{isFavorite ? 'Eliminar de favoritos' : 'Agregar a favoritos'}
@@ -77,6 +103,7 @@ const styles = StyleSheet.create({
 		color: 'white',
 	},
 	card: {
+		justifyContent: 'space-between',
 		backgroundColor: '#1e293b',
 		borderRadius: 10,
 		padding: 20,
@@ -85,6 +112,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.8,
 		shadowRadius: 2,
 		elevation: 5,
+		height: '100%',
 	},
 	title: {
 		fontSize: 18,
@@ -104,7 +132,8 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	favoriteButton: {
-		backgroundColor: '#5C6EF8',
+		margin: 20,
+		backgroundColor: '#F97316',
 		paddingVertical: 12,
 		borderRadius: 8,
 		alignItems: 'center',
