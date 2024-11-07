@@ -5,7 +5,7 @@ import {create} from 'zustand';
 interface InstitutionsStoreState {
 	institution: Institution | null;
 	institutions: Institution[] | null;
-	setInstitution: (institution: Institution) => Promise<void>;
+	setInstitution: (institution: Institution | null) => Promise<void>;
 
 	getInstitutions: (active: string) => Promise<void>;
 }
@@ -13,7 +13,7 @@ interface InstitutionsStoreState {
 const useInstitutionsStore = create<InstitutionsStoreState>((set) => ({
 	institution: null,
 	institutions: null,
-	setInstitution: async (institution: Institution) => {
+	setInstitution: async (institution: Institution | null) => {
 		set((state) => ({...state, institution: institution}));
 	},
 	getInstitutions: async (active: string) => {
