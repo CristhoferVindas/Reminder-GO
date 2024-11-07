@@ -5,7 +5,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {StackCategory} from '../stackCategory/StackCategory';
 import {StackCalendar} from '../stackCalendar/StackCalendar';
 import {StackSavedActiviy} from '../stackSavedActivities/StackSavedActivities';
-import Configuration from '@/components/configuration/Configuration';
+import {StackConfiguration} from '../stackConfiguration/StackConfiguration';
 
 const Tabs = createBottomTabNavigator();
 export default function TabLayout() {
@@ -16,8 +16,9 @@ export default function TabLayout() {
 			screenOptions={{
 				tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
 				headerShown: false,
+				tabBarHideOnKeyboard: true,
 				tabBarStyle: {
-					backgroundColor: 'black',
+					backgroundColor: Colors[colorScheme ?? 'dark'].background,
 				},
 			}}
 		>
@@ -53,7 +54,7 @@ export default function TabLayout() {
 			/>
 			<Tabs.Screen
 				name="configuration"
-				component={Configuration}
+				component={StackConfiguration}
 				options={{
 					title: 'Configuración',
 					tabBarIcon: ({color, focused}) => (
