@@ -7,7 +7,7 @@ export type Institutions_x_users_x_roles = {
 	institutions_id: number | null;
 	users_id: number;
 	roles_id: number;
-	roles: Role;
+	roles: Role | null;
 	users: User;
 	institutions: Institution;
 };
