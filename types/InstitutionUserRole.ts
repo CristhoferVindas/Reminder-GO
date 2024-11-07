@@ -1,6 +1,6 @@
 import {Institution} from '@/types/Institution';
 import {User} from '@/types/User.type';
-import {Role} from 'react-native';
+import {Role} from './Role.type';
 
 export type Institutions_x_users_x_roles = {
 	id?: number | undefined;
