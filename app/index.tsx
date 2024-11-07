@@ -1,12 +1,28 @@
-import {Text, View} from 'react-native';
-import LoginGoogle from '@/components/login/LoginGoogle';
+import {createStackNavigator} from '@react-navigation/stack';
+import LoginScreen from '@/components/login/LoginGoogle';
+import SignInGoogle from '@/components/signin/signinGoogle';
+export type LoginStackParamList = {
+	Login: undefined;
+	SignInGoogle: undefined;
+};
 
+const Stack = createStackNavigator<LoginStackParamList>();
 const home = () => {
 	return (
-		<View style={{height: '100%', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-			<Text style={{color: 'green'}}>sss</Text>
-			<LoginGoogle></LoginGoogle>
-		</View>
+		<Stack.Navigator
+			initialRouteName="Login"
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: '#111827',
+				},
+				headerTintColor: '#fff',
+				headerShown: true,
+				headerTitle: '',
+			}}
+		>
+			<Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}} />
+			<Stack.Screen name="SignInGoogle" component={SignInGoogle} options={{headerShown: false}} />
+		</Stack.Navigator>
 	);
 };
 
