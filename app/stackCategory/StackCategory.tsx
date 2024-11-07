@@ -3,14 +3,15 @@ import Categories from '@/components/category/Categories';
 import Activities from '@/components/activity/Activities';
 import ActivitiesDetails from '@/components/activity/ActivitiesDetails';
 import {Activity} from '@/types/Activity.type';
-export type RootStackParamList = {
+import {Category} from '@/types/Category.type';
+export type CategoryStackParamList = {
 	Home: undefined;
-	Activities: {categoryId: number};
+	Activities: {categoryId: Category};
 	ActivitiesDetails: {activityId: Activity};
 	Calendar: {categoryId: number};
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<CategoryStackParamList>();
 export function StackCategory() {
 	return (
 		<Stack.Navigator
@@ -21,12 +22,28 @@ export function StackCategory() {
 				},
 				headerTintColor: '#fff',
 				headerShown: true,
-				headerTitle: '',
+				headerTitle: 'Categorías',
 			}}
 		>
 			<Stack.Screen name="Home" component={Categories} />
-			<Stack.Screen name="Activities" component={Activities} />
-			<Stack.Screen name="ActivitiesDetails" component={ActivitiesDetails} />
+			<Stack.Screen
+				name="Activities"
+				component={Activities}
+				options={({route}) => ({
+					title: 'sadasdas',
+					headerTitle: 'Actividades ' + route.params.categoryId.name,
+					animationEnabled: false,
+				})}
+			/>
+			<Stack.Screen
+				name="ActivitiesDetails"
+				component={ActivitiesDetails}
+				options={({route}) => ({
+					title: 'sadasdas',
+					headerTitle: 'Detalles de Actividad ',
+					animationEnabled: false,
+				})}
+			/>
 		</Stack.Navigator>
 	);
 }
