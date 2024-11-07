@@ -56,7 +56,7 @@ async function deleteUserActivity(id: string) {
 		const data = await response.json();
 		return data as UserActivity;
 	} catch (error) {
-		console.error('Error obteniendo las Actividades por estado:', error);
+		console.error(`Error Eliminando la actividad: con id: ${id}`, error);
 		throw error;
 	}
 }
