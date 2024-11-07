@@ -8,11 +8,19 @@ interface Institutions_x_users_x_rolesState {
 
 	getInstitutions_x_users_x_rolesByIdUser: (idUser: string) => Promise<void>;
 	getInstitutions_x_users_x_rolesByEmails: (idUser: string) => Promise<void>;
+	createInstitutions_x_users_x_rolesByIdUser: (
+		institutions_x_users_x_roles: Institutions_x_users_x_roles
+	) => Promise<void>;
 }
 const useInstitutions_x_users_x_rolesStore = create<Institutions_x_users_x_rolesState>((set) => ({
 	institutions_x_users_x_roles: [],
 	institution_x_users_x_roles: null,
-
+	createInstitutions_x_users_x_rolesByIdUser: async (
+		institutions_x_users_x_roles: Institutions_x_users_x_roles
+	) => {
+		const newServiceInstitutions_x_users_x_role =
+			await InstitutionUserRoleProvider.createInstitutions_x_users_x_roles(institutions_x_users_x_roles);
+	},
 	getInstitutions_x_users_x_rolesByIdUser: async (idUser: string) => {
 		const newServiceInstitutions_x_users_x_roles =
 			await InstitutionUserRoleProvider.getInstitutions_x_users_x_rolesByIdUser(idUser);
