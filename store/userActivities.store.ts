@@ -5,7 +5,7 @@ import {create} from 'zustand';
 interface UserActivitiesStoreState {
 	userActivity: UserActivity | null;
 	userActivities: UserActivity[] | null;
-	getUserActivities: (userID: string) => Promise<void>;
+	getUserActivities: (userID: string, institutionId: string) => Promise<void>;
 	createUserActivity: (userActivity: UserActivity) => Promise<void>;
 	deleteUserActivity: (userActivityID: string) => Promise<void>;
 	setUserActivity: (userActivity: UserActivity) => Promise<void>;
@@ -35,8 +35,11 @@ const useUserActivitiesStore = create<UserActivitiesStoreState>((set) => ({
 		}
 	},
 
-	getUserActivities: async (userID: string) => {
-		const newUserActivities = await UsersActivitiesProvider.getUsersActivitiesByUserID(userID);
+	getUserActivities: async (userID: string, institutionId: string) => {
+		const newUserActivities = await UsersActivitiesProvider.getUsersActivitiesByUserID(
+			userID,
+			institutionId
+		);
 		set((state) => ({...state, userActivities: newUserActivities}));
 	},
 	setUserActivity: async (userActivity: UserActivity) => {
