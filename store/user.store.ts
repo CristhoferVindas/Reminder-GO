@@ -1,4 +1,5 @@
 import {UsersProvider} from '@/provider/User.provider';
+import {Institution} from '@/types/Institution';
 import {User} from '@/types/User.type';
 import {create} from 'zustand';
 
@@ -8,6 +9,7 @@ interface UsersStoreState {
 	createUser: (user: User) => Promise<void>;
 	getUsersByEmail: (email: string) => Promise<void>;
 	setUser: (user: User | null) => Promise<void>;
+	setUserInstitution: (institution: Institution | null) => Promise<void>;
 }
 
 const useUsersStore = create<UsersStoreState>((set) => ({
@@ -24,6 +26,9 @@ const useUsersStore = create<UsersStoreState>((set) => ({
 	},
 	setUser: async (user: User | null) => {
 		set({user: user});
+	},
+	setUserInstitution: async (institution: Institution | null) => {
+		set((state) => ({user: {...state.user!, institutions: institution || undefined}}));
 	},
 }));
 
