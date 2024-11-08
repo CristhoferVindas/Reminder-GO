@@ -9,8 +9,8 @@ interface ActivitiesStoreState {
 	activitiesByCategory: Activity[] | null;
 	activitiesCalendar: Activity[] | null;
 
-	getActivitiesByCategoryID: (category_id: number) => Promise<void>;
-	getActivitiesByDate: (date: Date) => Promise<void>;
+	getActivitiesByCategoryID: (category_id: string, institutionId: string) => Promise<void>;
+	getActivitiesByDate: (date: Date, institutionId: string) => Promise<void>;
 	getActivitiesByInstitutionID: (active: string, institution_id: string) => Promise<void>;
 }
 
@@ -21,16 +21,19 @@ const useActivitiesStore = create<ActivitiesStoreState>((set) => ({
 	activitiesByDate: null,
 	activitiesCalendar: null,
 
-	getActivitiesByCategoryID: async (category_id: number) => {
-		const newActivities = await ActivitiesProvider.getActivitiesByCategoryID(category_id);
+	getActivitiesByCategoryID: async (category_id: string, institutionId: string) => {
+		const newActivities = await ActivitiesProvider.getActivitiesByCategoryID(
+			category_id,
+			institutionId
+		);
 		set((state) => ({...state, activitiesByCategory: newActivities}));
 	},
 	getActivitiesByInstitutionID: async (active: string, institution_id: string) => {
 		const newActivities = await ActivitiesProvider.getActivitiesByInstitutionID(active, institution_id);
 		set((state) => ({...state, activitiesCalendar: newActivities}));
 	},
-	getActivitiesByDate: async (date: Date) => {
-		const newActivities = await ActivitiesProvider.getActivitiesByDate(date);
+	getActivitiesByDate: async (date: Date, institutionId: string) => {
+		const newActivities = await ActivitiesProvider.getActivitiesByDate(date, institutionId);
 		set((state) => ({...state, activitiesByDate: newActivities}));
 	},
 }));
