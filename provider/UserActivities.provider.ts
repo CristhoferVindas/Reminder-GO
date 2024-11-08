@@ -1,10 +1,12 @@
 import {UserActivity} from '@/types/UserActivity';
 
-async function getUsersActivitiesByUserID(userId: string) {
+async function getUsersActivitiesByUserID(userId: string, institutionId: string) {
 	try {
 		const ip = process.env.EXPO_PUBLIC_DIRECCIONIP as string;
 		const response = await fetch(
-			`http://${process.env.EXPO_PUBLIC_DIRECCIONIP as string}:3000/api/user_activities/userId/${userId}`
+			`http://${
+				process.env.EXPO_PUBLIC_DIRECCIONIP as string
+			}:3000/api/user_activities/userId/${userId}/${institutionId}`
 		);
 		if (!response.ok) {
 			throw new Error(`Error en la solicitud: ${response.statusText}`);

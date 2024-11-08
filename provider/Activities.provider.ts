@@ -1,11 +1,11 @@
 import {Activity} from '@/types/Activity.type';
 
-async function getActivitiesByCategoryID(category_id: number) {
+async function getActivitiesByCategoryID(categoryId: string, institutionId: string) {
 	try {
 		const response = await fetch(
 			`http://${
 				process.env.EXPO_PUBLIC_DIRECCIONIP as string
-			}:3000/api/activities/byCategory/${category_id}`
+			}:3000/api/activities/byCategory/${categoryId}/${institutionId}`
 		);
 		if (!response.ok) {
 			throw new Error(`Error en la solicitud: ${response.statusText}`);
@@ -18,11 +18,13 @@ async function getActivitiesByCategoryID(category_id: number) {
 		throw error;
 	}
 }
-async function getActivitiesByDate(date: Date) {
+async function getActivitiesByDate(date: Date, institutionId: string) {
 	try {
 		const dateString = date.toISOString().split('T')[0];
 		const response = await fetch(
-			`http://${process.env.EXPO_PUBLIC_DIRECCIONIP as string}:3000/api/activities/byDate/${dateString}`,
+			`http://${
+				process.env.EXPO_PUBLIC_DIRECCIONIP as string
+			}:3000/api/activities/byDate/${dateString}/${institutionId}`,
 			{
 				method: 'GET',
 			}
