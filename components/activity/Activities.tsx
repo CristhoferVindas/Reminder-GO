@@ -11,8 +11,9 @@ import {CategoryStackParamList} from '@/app/stackCategory/StackCategory';
 import {MaterialIcons} from '@expo/vector-icons';
 import useUserActivitiesStore from '@/store/userActivities.store';
 import useUsersStore from '@/store/user.store';
-import {registerForPushNotificationsAsync} from '@/notifications/PushNotifications';
-import {User} from '@/types/User.type';
+import { registerForPushNotificationsAsync } from '@/notifications/PushNotifications';
+import { User } from '@/types/User.type';
+import { UserActivity } from '@/types/UserActivity';
 
 type ActivitiesScreenNavigationProp = StackNavigationProp<
 	CategoryStackParamList,
@@ -43,25 +44,27 @@ const Activities = ({navigation}: Props) => {
 	const {categoryId} = route.params;
 	const [isFavorite, setIsFavorite] = useState(false);
 
-	const handleFavoritePress = (userActivity: Activity) => {
-		if (isFavorite) {
+	const handleFavoritePress = (activity: Activity, userActivity: UserActivity | undefined) => {
+		if (userActivity) {
 			deleteUserActivity(userActivity?.id?.toString() || '');
 		} else {
 			createUserActivity({
 				users: user || ({} as User),
-				activities: userActivity,
-				activity_id: userActivity.id,
+				activities: activity,
+				activity_id: activity.id,
 				user_id: user?.id || 0,
 				classification_id: 0,
 				filed: 'S',
 			});
-			scheduleActivity(userActivity);
+			scheduleActivity(activity);
 		}
 	};
 	const scheduleActivity = async (activity: Activity) => {
 		try {
 			const expoPushToken = await registerForPushNotificationsAsync();
 			const scheduledDate = activity.date;
+			const activityId = activity.id;
+
 
 			await fetch(`http://${process.env.EXPO_PUBLIC_DIRECCIONIP as string}:3000/api/notifications`, {
 				method: 'POST',
@@ -73,6 +76,8 @@ const Activities = ({navigation}: Props) => {
 					title: activity.name,
 					body: activity.description,
 					scheduledDate,
+					activityId
+
 				}),
 			});
 		} catch (error) {
@@ -80,8 +85,11 @@ const Activities = ({navigation}: Props) => {
 		}
 	};
 	useEffect(() => {
-		getUserActivities(user?.id?.toString() || '');
-		getActivitiesByCategoryID(categoryId?.id || 0);
+		getUserActivities(user?.id?.toString() || '', user?.institutions?.id?.toString() || '');
+		getActivitiesByCategoryID(
+			categoryId?.id?.toString() || '',
+			user?.institutions?.id?.toString() || ''
+		);
 		getClassifications('A');
 	}, [categoryId]);
 
@@ -104,7 +112,10 @@ const Activities = ({navigation}: Props) => {
 
 	const onRefresh = () => {
 		setRefreshing(true);
-		getActivitiesByCategoryID(categoryId?.id || 0);
+		getActivitiesByCategoryID(
+			categoryId?.id?.toString() || '',
+			user?.institutions?.id?.toString() || ''
+		);
 		getClassifications('A');
 		setRefreshing(false);
 	};
@@ -113,7 +124,9 @@ const Activities = ({navigation}: Props) => {
 		navigation.navigate('ActivitiesDetails', {activityId: activity});
 	};
 
-	const renderActivity = ({item}: {item: Activity}) => {
+	const renderActivity = ({ item }: { item: Activity }) => {
+		const isfav = userActivities?.find((userActivity) => userActivity.activities.id === item.id);
+
 		return (
 			<TouchableOpacity onPress={() => handleActivityPress(item)}>
 				<View style={styles.activityContainer}>
@@ -124,17 +137,14 @@ const Activities = ({navigation}: Props) => {
 							{convertDateToDMYString(new Date(item.date))} - {convertDateToTimeString(new Date(item.time))}
 						</Text>
 					</View>
-					<TouchableOpacity style={styles.favoriteIconContainer} onPress={() => handleFavoritePress(item)}>
+					<TouchableOpacity
+						style={styles.favoriteIconContainer}
+						onPress={() => handleFavoritePress(item, isfav)}
+					>
 						<MaterialIcons
-							name={
-								userActivities?.find((userActivity) => userActivity.activities.id == item.id)
-									? 'favorite'
-									: 'favorite-border'
-							}
+							name={isfav ? 'favorite' : 'favorite-border'}
 							size={24}
-							color={
-								userActivities?.find((userActivity) => userActivity.activities.id == item.id) ? '#F97316' : 'gray'
-							}
+							color={isfav ? '#F97316' : 'gray'}
 						/>
 					</TouchableOpacity>
 				</View>
