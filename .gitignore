@@ -19,3 +19,28 @@ web-build/
 .env
 expo-env.d.ts
 # @end expo-cli
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Android
+android/app/build/
+android/.gradle/
+android/.idea/
+*.keystore
+
+# iOS
+ios/Pods/
+ios/build/
+ios/*.xcworkspace
+ios/Podfile.lock
+
+# Misc
+*.log
+.env
+.DS_Store
+google-services.json
+GoogleService-Info.plist
+serviceAccountKey.json
+*.json
