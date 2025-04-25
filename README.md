@@ -1,45 +1,45 @@
 # 📱 Reminder GO
 
-Aplicación móvil para la gestión de recordatorios académicos e institucionales. Desarrollada con React Native y Expo, integrada con Firebase y Google Sign-In. Permite a estudiantes y administradores gestionar eventos, recibir notificaciones y visualizar recordatorios desde un calendario interactivo.
+Mobile application for managing academic and institutional reminders. Built with React Native and Expo, integrated with Firebase and Google Sign-In. Allows students and administrators to manage events, receive push notifications, and view reminders on an interactive calendar.
 
 ---
 
-### 🧰 Tecnologías Utilizadas
+### 🧰 Technologies Used
 
 - ⚛️ Expo + React Native  
 - 🧭 React Navigation  
 - 🔐 Google Sign-In + Firebase Authentication  
-- 🧠 Zustand (manejo de estado global)  
-- 🌐 Integración con plataforma web (Next.js)
+- 🧠 Zustand (global state management)  
+- 🌐 Integration with web platform (Next.js)
 
 ---
 
-### 🚀 Instalación
+### 🚀 Installation
 
-1. Clona el repositorio y entra en el proyecto:
+1. Clone the repository and navigate into the project:
 
     ```bash
-    git clone https://github.com/tuusuario/reminder-go.git
+    git clone https://github.com/CristhoferVindas/Reminder-GO.git
     cd reminder-go
     ```
 
-2. Instala las dependencias:
+2. Install the dependencies:
 
     ```bash
     npm install
     ```
 
-3. Configura el entorno:
+3. Set up the environment:
 
-    - Crea un proyecto en [Firebase](https://console.firebase.google.com/).
-    - Habilita **Google Sign-In** y copia el **Web Client ID**.
-    - Crea un archivo `.env` en la raíz del proyecto y agrega:
+    - Create a project in [Firebase](https://console.firebase.google.com/).
+    - Enable **Google Sign-In** and copy the **Web Client ID**.
+    - Create a `.env` file in the root directory and add:
 
       ```env
       EXPO_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID
       ```
 
-4. Inicia la aplicación:
+4. Start the application:
 
     ```bash
     npx expo start
@@ -47,24 +47,24 @@ Aplicación móvil para la gestión de recordatorios académicos e institucional
 
 ---
 
-### ✨ Funcionalidades
+### ✨ Features
 
-- 🔐 **Inicio de sesión con Google**
-- 📬 **Notificaciones push para eventos importantes**
-- 📅 **Visualización de recordatorios en calendario interactivo**
-- 👥 **Una cuenta para múltiples instituciones**
+- 🔐 **Google Sign-In authentication**
+- 📬 **Push notifications for important events**
+- 📅 **Reminder display in an interactive calendar**
+- 👥 **Single account for multiple institutions**
 
 ---
 
-### 🔍 Código Destacado
+### 🔍 Code Highlights
 
 ```js
-// Configuración de Google Sign-In
+// Google Sign-In configuration
 GoogleSignin.configure({
   webClientId: process.env.EXPO_WEB_CLIENT_ID,
 });
 
-// Autenticación con Firebase
+// Firebase authentication
 const handleGoogleSignIn = async () => {
   const { idToken } = await GoogleSignin.signIn();
   const googleCredential = GoogleAuthProvider.credential(idToken);
