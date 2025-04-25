@@ -30,7 +30,7 @@ export function StackCategory() {
 				name="Activities"
 				component={Activities}
 				options={({route}) => ({
-					title: 'sadasdas',
+					title: 'Actividades',
 					headerTitle: 'Actividades ' + route.params.categoryId.name,
 					animationEnabled: false,
 				})}
@@ -38,8 +38,8 @@ export function StackCategory() {
 			<Stack.Screen
 				name="ActivitiesDetails"
 				component={ActivitiesDetails}
-				options={({route}) => ({
-					title: 'sadasdas',
+				options={() => ({
+					title: 'Detalles de Actividad',
 					headerTitle: 'Detalles de Actividad ',
 					animationEnabled: false,
 				})}
