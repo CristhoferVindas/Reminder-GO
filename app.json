@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "activitiesmobile",
+    "slug": "activitiesmobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "blundleIdentifier": "kame.devs.activities",
+      "googleServicesFile": "C:/Users/vinda/OneDrive/Documentos/GitHub/AdministratorActivities-mobile/GoogleService-Info.plist"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "kame.devs.activities",
+      "googleServicesFile": "C:/Users/vinda/OneDrive/Documentos/GitHub/AdministratorActivities-mobile/google-services.json"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4d57e525-c1fb-4aff-9457-d4496ae71639"
+      }
+    }
+  }
+}
