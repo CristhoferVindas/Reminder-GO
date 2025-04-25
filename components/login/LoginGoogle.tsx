@@ -39,12 +39,6 @@ export default function LoginGoogle() {
 	);
 
 	useEffect(() => {
-		GoogleSignin.configure({
-			webClientId: '677379829038-0s8me94qm20o8dl38uti35755a1ugq5e.apps.googleusercontent.com',
-		});
-	}, []);
-
-	useEffect(() => {
 		if (user && insti_x_users_x_roles) {
 			setUserInStore({
 				name: insti_x_users_x_roles?.users?.name || '',
@@ -64,10 +58,12 @@ export default function LoginGoogle() {
 	const handleGoogleSignIn = async () => {
 		setIsLoading(true);
 		try {
+			await GoogleSignin.signOut(); 
 			await GoogleSignin.hasPlayServices();
 			const userInfo = await GoogleSignin.signIn();
-			const {data} = userInfo;
-			const googleCredential = GoogleAuthProvider.credential(data?.idToken);
+			const { data } = userInfo;
+			const idToken = await GoogleSignin.getTokens(); 
+			const googleCredential = GoogleAuthProvider.credential(idToken.idToken);
 			const userCredential = await signInWithCredential(auth, googleCredential);
 			const loggedInUser = userCredential.user;
 
