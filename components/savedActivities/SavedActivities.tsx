@@ -35,7 +35,7 @@ const SavedActivities = ({navigation}: Props) => {
 
 	useEffect(() => {
 		if (user?.id) {
-			getUserActivities(user.id.toString());
+			getUserActivities(user.id.toString(), user?.institutions?.id?.toString() || '');
 		}
 		if (user?.institutions?.id) {
 			getCategories('A', user.institutions.id.toString());
@@ -44,7 +44,6 @@ const SavedActivities = ({navigation}: Props) => {
 
 	useEffect(() => {
 		if (categories) {
-			// Inicializa `switchStates` con todos los valores en `false` para que los filtros inicien desactivados
 			const initialSwitchStates = categories.reduce((acc, category) => {
 				acc[category.id || 0] = false;
 				return acc;
@@ -70,15 +69,14 @@ const SavedActivities = ({navigation}: Props) => {
 			activeFilters.length === 0
 				? userActivities?.map((userActivity) => userActivity.activities) || []
 				: userActivities
-						?.filter((userActivity) =>
-							activeFilters.includes(userActivity.activities.category_id?.toString() || '')
-						)
-						.map((userActivity) => userActivity.activities) || [];
+					?.filter((userActivity) =>
+						activeFilters.includes(userActivity.activities.category_id?.toString() || '')
+					)
+					.map((userActivity) => userActivity.activities) || [];
 
 		setActivities(filteredActivities);
 	};
 
-	// Función para mostrar todas las actividades cuando no hay filtros activos
 	const onClearFilters = () => {
 		setActivities(userActivities?.map((userActivity) => userActivity.activities) || []);
 	};
@@ -86,7 +84,7 @@ const SavedActivities = ({navigation}: Props) => {
 	const onRefresh = async () => {
 		setRefreshing(true);
 		if (user?.id) {
-			await getUserActivities(user.id.toString());
+			await getUserActivities(user.id.toString(), user?.institutions?.id?.toString() || '');
 		}
 		setRefreshing(false);
 	};
@@ -128,7 +126,7 @@ const SavedActivities = ({navigation}: Props) => {
 				categories={categories || []}
 				switchStates={switchStates}
 				onToggleSwitch={toggleSwitch}
-				onClearFilters={onClearFilters} // Pasa la función aquí
+				onClearFilters={onClearFilters}
 			/>
 
 			<View style={styles.activitiesContainer}>

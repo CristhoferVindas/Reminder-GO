@@ -46,7 +46,7 @@ export default function SignUpGoogle() {
 		getInstitutions('A').finally(() => setIsLoading((prev) => ({...prev, institutions: false})));
 
 		GoogleSignin.configure({
-			webClientId: '677379829038-0s8me94qm20o8dl38uti35755a1ugq5e.apps.googleusercontent.com',
+			webClientId: process.env.EXPO_WEB_CLIENT_ID,
 		});
 	}, []);
 

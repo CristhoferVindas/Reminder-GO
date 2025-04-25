@@ -72,6 +72,8 @@ const CategoryFilterDropdown = ({
 									onToggleSwitch(category.id.toString());
 								}
 							}}
+							thumbColor="#fffff"
+							trackColor={{ false: '#767577', true: '#F97316' }}
 						/>
 					</View>
 				))}

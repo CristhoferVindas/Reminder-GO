@@ -52,28 +52,28 @@ const styles = StyleSheet.create({
 		paddingTop: 100,
 
 		padding: 20,
-		backgroundColor: '#1F2937', // Fondo oscuro para la consistencia de la app
+		backgroundColor: '#1F2937',
 	},
 	logo: {
 		width: 100,
 		height: 100,
 		marginBottom: 20,
-		borderRadius: 50, // Agrega bordes redondeados para darle un toque moderno
+		borderRadius: 50, 
 	},
 	appName: {
 		fontSize: 24,
 		fontWeight: '700',
-		color: '#F3F4F6', // Texto claro en contraste con el fondo oscuro
+		color: '#F3F4F6', 
 		marginBottom: 5,
 	},
 	version: {
 		fontSize: 16,
-		color: '#A0AEC0', // Color de texto menos resaltado para la versión
+		color: '#A0AEC0', 
 		marginBottom: 20,
 	},
 	description: {
 		fontSize: 16,
-		color: '#D1D5DB', // Texto en tono gris claro
+		color: '#D1D5DB',
 		textAlign: 'center',
 		marginBottom: 20,
 		lineHeight: 22,
@@ -90,17 +90,17 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: '700',
 		marginLeft: 10,
-		color: '#F3F4F6', // Título claro para resaltar
+		color: '#F3F4F6', 
 	},
 	sectionContent: {
 		fontSize: 16,
 		marginLeft: 10,
-		color: '#A0AEC0', // Color menos resaltado para el contenido
+		color: '#A0AEC0',
 	},
 	footer: {
 		marginTop: 30,
 		fontSize: 14,
-		color: '#A0AEC0', // Color tenue para el pie de página
+		color: '#A0AEC0', 
 		textAlign: 'center',
 	},
 });
