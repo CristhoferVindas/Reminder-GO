@@ -11,7 +11,7 @@ import MapScreen from '../Maps/MapView';
 
 type ActivitiesDetailsRouteProp = RouteProp<CategoryStackParamList, 'ActivitiesDetails'>;
 
-const ActivitiesDetails = () => {
+export const ActivitiesDetails = () => {
 	const route = useRoute<ActivitiesDetailsRouteProp>();
 	const {activityId} = route.params;
 	const [latitude, longitude] = activityId.location.split(' ').map(Number);
@@ -70,12 +70,24 @@ const ActivitiesDetails = () => {
 		}
 	}, [userActivities]);
 
+	const formattedDate = new Date(activityId.date).toLocaleDateString('es-ES', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+	const formattedTime = new Date(activityId.time).toLocaleTimeString('es-ES', {
+		hour: '2-digit',
+		minute: '2-digit',
+	});
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.card}>
 				<Text style={styles.title}>{activityId.name}</Text>
 				<Text style={styles.description}>{activityId.description}</Text>
-				<Text style={styles.description}>Categoría: {activityId.categories.name}</Text>
+				<Text style={styles.category}>Categoría: {activityId.categories.name}</Text>
+				<Text style={styles.date}>Fecha: {formattedDate}</Text>
+				<Text style={styles.time}>Hora: {formattedTime}</Text>
 
 				<MapScreen key={activityId.id} latitude={latitude} longitude={longitude} />
 
@@ -92,55 +104,63 @@ const ActivitiesDetails = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#374151',
+		backgroundColor: '#1F2937',
 		padding: 20,
-	},
-	header: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		textAlign: 'center',
-		marginBottom: 20,
-		color: 'white',
 	},
 	card: {
-		justifyContent: 'space-between',
-		backgroundColor: '#1e293b',
-		borderRadius: 10,
+		backgroundColor: '#2D3748',
+		borderRadius: 12,
 		padding: 20,
 		shadowColor: '#000',
-		shadowOffset: {width: 0, height: 2},
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-		height: '100%',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 4,
+		elevation: 8,
 	},
 	title: {
-		fontSize: 18,
-		fontWeight: 'bold',
+		fontSize: 20,
+		fontWeight: '700',
 		marginBottom: 10,
-		color: '#fff',
+		color: '#F3F4F6',
 	},
 	description: {
-		fontSize: 14,
-		marginBottom: 20,
-		color: '#fff',
-	},
-	subheader: {
 		fontSize: 16,
-		fontWeight: 'bold',
-		color: '#fff',
+		marginBottom: 10,
+		color: '#D1D5DB',
+		lineHeight: 22,
+	},
+	category: {
+		fontSize: 14,
+		color: '#A0AEC0',
 		marginBottom: 10,
 	},
+	date: {
+		fontSize: 16,
+		color: '#D1D5DB',
+		fontWeight: '500',
+		marginBottom: 5,
+	},
+	time: {
+		fontSize: 16,
+		color: '#D1D5DB',
+		fontWeight: '500',
+		marginBottom: 15,
+	},
 	favoriteButton: {
-		margin: 20,
+		marginVertical: 20,
 		backgroundColor: '#F97316',
-		paddingVertical: 12,
-		borderRadius: 8,
+		paddingVertical: 14,
+		borderRadius: 10,
 		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 3 },
+		shadowOpacity: 0.2,
+		shadowRadius: 3,
+		elevation: 6,
 	},
 	favoriteText: {
-		color: 'white',
-		fontWeight: 'bold',
+		color: '#FFFFFF',
+		fontWeight: '700',
 		fontSize: 16,
 	},
 });
