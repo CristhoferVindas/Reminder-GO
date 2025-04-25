@@ -21,8 +21,12 @@ export function StackLogin() {
 				animationEnabled: false,
 			}}
 		>
-			<Stack.Screen name="Login" component={LoginScreen} />
-			<Stack.Screen name="LoginActivities" component={SignInGoogle} />
+			<Stack.Screen name="Login" component={LoginScreen} options={() => ({
+				animationEnabled: false,
+			})} />
+			<Stack.Screen name="LoginActivities" component={SignInGoogle} options={() => ({
+				animationEnabled: false,
+			})} />
 		</Stack.Navigator>
 	);
 }
