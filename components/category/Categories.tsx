@@ -6,6 +6,7 @@ import {Category} from '@/types/Category.type';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CategoryStackParamList} from '@/app/stackCategory/StackCategory';
 import useUsersStore from '@/store/user.store';
+import NotificationModal from '../notificationModal/NotificationModal';
 
 type ActivitiesScreenNavigationProp = StackNavigationProp<CategoryStackParamList, 'Activities'>;
 
@@ -21,10 +22,10 @@ const Categories = ({navigation}: Props) => {
 	const user = useUsersStore((state) => state.user);
 
 	useEffect(() => {
-		if (categories == null && user?.institutions?.id) {
+		if (user?.institutions?.id) {
 			getCategories('A', user?.institutions.id.toString());
 		}
-	}, [categories, user]);
+	}, [, user]);
 
 	useEffect(() => {
 		if (search) {
@@ -44,7 +45,7 @@ const Categories = ({navigation}: Props) => {
 			<Image
 				source={{
 					uri:
-						'https://e7.pngegg.com/pngimages/75/866/png-clipart-category-management-organization-retail-management-miscellaneous-text-thumbnail.png',
+						'https://i.pinimg.com/736x/2b/0c/9d/2b0c9d791afa8682151e3aafb9318f34.jpg',
 				}}
 				style={styles.categoryImage}
 			/>
@@ -57,6 +58,7 @@ const Categories = ({navigation}: Props) => {
 
 	return (
 		<View style={styles.container}>
+			<NotificationModal />
 			<View style={styles.profileContainer}>
 				<Image source={{uri: user?.image}} style={styles.profileImage} />
 				<Text style={styles.profileName}>{user?.name}</Text>
