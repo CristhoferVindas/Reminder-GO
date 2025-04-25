@@ -41,7 +41,7 @@ const CalendarActivities = ({navigation}: Props) => {
 	const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>({});
 
 	useEffect(() => {
-		getActivitiesByDate(new Date(date));
+		getActivitiesByDate(new Date(date), user?.institutions?.id ? user.institutions.id.toString() : '');
 		if (user?.institutions?.id) {
 			getCategories('A', user.institutions.id.toString());
 		}
@@ -49,7 +49,6 @@ const CalendarActivities = ({navigation}: Props) => {
 
 	useEffect(() => {
 		if (categories) {
-			// Inicializa `switchStates` con todos los valores en `false` para que los filtros inicien desactivados
 			const initialSwitchStates = categories.reduce((acc, category) => {
 				acc[category.id || 0] = false;
 				return acc;
@@ -127,9 +126,8 @@ const CalendarActivities = ({navigation}: Props) => {
 		<View style={styles.container}>
 			<Text style={styles.header}>{convertDateToDMYString(new Date(date))}</Text>
 
-			{/* Componente de Filtro por Categorías */}
 			<CategoryFilterSwitch
-			onClearFilters={() => { }}
+				onClearFilters={() => { }}
 				categories={categories || ([] as Category[])}
 				switchStates={switchStates}
 				onToggleSwitch={toggleSwitch}
