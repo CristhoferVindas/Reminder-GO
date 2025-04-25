@@ -32,7 +32,7 @@ const CalendarScreen = ({navigation}: Props) => {
 		const items: {[key: string]: Activity[]} = {};
 
 		activitiesCalendar?.forEach((activity: Activity) => {
-			const date = new Date(activity.date).toISOString().split('T')[0];
+			const date = new Date(activity.date).toLocaleDateString('en-CA'); 
 			if (!items[date]) {
 				items[date] = [];
 			}
@@ -59,7 +59,7 @@ const CalendarScreen = ({navigation}: Props) => {
 					<TouchableOpacity style={styles.eventItem} onPress={() => handlePress(item)} activeOpacity={0.8}>
 						<Text style={styles.eventText}>{item.name}</Text>
 						<Text style={styles.eventDescription}>{item.description}</Text>
-						<Text style={styles.eventLocation}>Ubicación: {item.location}</Text>
+						<Text style={styles.eventLocation}>Categoría: {item.categories.name}</Text>
 					</TouchableOpacity>
 				)}
 				renderEmptyData={() => (
