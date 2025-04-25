@@ -1,51 +1,55 @@
-import * as SecureStore from 'expo-secure-store';
 import useUsersStore from '@/store/user.store';
-import {User} from '@/types/User.type';
-import {Stack, useRouter} from 'expo-router';
-import {useEffect, useState} from 'react';
+import { Stack, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
 	registerForPushNotificationsAsync,
 	setNotificationListeners,
 } from '@/notifications/PushNotifications';
+import { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+import { AppRegistry } from 'react-native';
+import useNotificationStore from '@/store/notification.store';
+
 
 export default function RootLayout() {
+
 	const user = useUsersStore((state) => state.user);
-	const [currentUser, setCurrentUser] = useState<User | null>(null);
+	const showNotificationModal = useNotificationStore((state) => (state.showNotificationModal));
+
 	const [renderKey, setRenderKey] = useState(0);
 	const router = useRouter();
 
-	const storeUser = async (user: User) => {
-		try {
-			await SecureStore.setItemAsync('currentUser', JSON.stringify(user));
-		} catch (error) {
-			console.error('Error guardando el usuario:', error);
-		}
-	};
-
 	useEffect(() => {
 		if (user == null) {
-			router.navigate('/');
+			router.navigate('/login');
 		} else {
-			setCurrentUser(user);
-			storeUser(user);
 			setRenderKey((prev) => prev + 1);
-			if (user?.institutions?.id == undefined || user?.roles?.id == 2) {
+			if (user.name == 'salir') {
+				router.replace('/');
+				return;
+			}
+			if (user.institutions?.id === undefined || user.roles?.id === 2) {
 				router.navigate('/waitingScreen');
-			} else {
+			}
+			if (user.institutions?.id === undefined || user.roles?.id === 2) { }
+			else {
 				router.replace('/(tabs)/');
 			}
 		}
 	}, [user]);
 
 	useEffect(() => {
-		const fetchToken = async () => {
-			const token = await registerForPushNotificationsAsync();
-			if (token) {
-			}
+		const initializeNotifications = async () => {
+			await registerForPushNotificationsAsync();
+			setNotificationListeners();
 		};
+		const onMessageReceivedInBackground = async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+			showNotificationModal(remoteMessage);
+		};
+		AppRegistry.registerHeadlessTask('ReactNativeFirebaseMessagingHeadlessTask', () => onMessageReceivedInBackground);
 
-		fetchToken();
-		setNotificationListeners();
+		console.log("Se inicializan las notificaciones");
+
+		initializeNotifications();
 	}, []);
 
 	return (
